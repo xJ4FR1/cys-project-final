@@ -1,0 +1,32 @@
+# Add logs and data directories to .gitignore
+logs/
+data/
+exports/
+
+# Docker volumes
+volumes/
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Archives
+*.tar.gz
+*.zip
+*.tar
