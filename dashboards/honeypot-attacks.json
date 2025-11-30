@@ -97,12 +97,18 @@
           },
           "fields": [
             {
-              "jsonPath": "$.timestamp",
+              "jsonPath": "$[*].timestamp",
               "name": "Time",
               "type": "time"
             },
             {
-              "jsonPath": "$.event_type",
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
+            },
+            {
+              "jsonPath": "$[*].event_type",
               "name": "Event Type"
             }
           ],
@@ -199,12 +205,18 @@
           },
           "fields": [
             {
-              "jsonPath": "$.timestamp",
+              "jsonPath": "$[*].timestamp",
               "name": "Time",
               "type": "time"
             },
             {
-              "jsonPath": "$.method",
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
+            },
+            {
+              "jsonPath": "$[*].method",
               "name": "Method"
             }
           ],
@@ -277,8 +289,14 @@
           },
           "fields": [
             {
-              "jsonPath": "$.username",
+              "jsonPath": "$[*].username",
               "name": "Username"
+            },
+            {
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
             }
           ],
           "method": "GET",
@@ -350,8 +368,14 @@
           },
           "fields": [
             {
-              "jsonPath": "$.path",
+              "jsonPath": "$[*].path",
               "name": "Path"
+            },
+            {
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
             }
           ],
           "method": "GET",
@@ -415,8 +439,14 @@
           },
           "fields": [
             {
-              "jsonPath": "$.username",
+              "jsonPath": "$[*].username",
               "name": "Username"
+            },
+            {
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
             }
           ],
           "method": "GET",
@@ -480,8 +510,14 @@
           },
           "fields": [
             {
-              "jsonPath": "$.method",
+              "jsonPath": "$[*].method",
               "name": "Method"
+            },
+            {
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
             }
           ],
           "method": "GET",
@@ -553,23 +589,29 @@
           },
           "fields": [
             {
-              "jsonPath": "$.timestamp",
+              "jsonPath": "$[*].timestamp",
               "name": "Time"
             },
             {
-              "jsonPath": "$.src_ip",
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
+            },
+            {
+              "jsonPath": "$[*].src_ip",
               "name": "Source IP"
             },
             {
-              "jsonPath": "$.username",
+              "jsonPath": "$[*].username",
               "name": "Username"
             },
             {
-              "jsonPath": "$.password",
+              "jsonPath": "$[*].password",
               "name": "Password"
             },
             {
-              "jsonPath": "$.event_type",
+              "jsonPath": "$[*].event_type",
               "name": "Event"
             }
           ],
@@ -650,23 +692,29 @@
           },
           "fields": [
             {
-              "jsonPath": "$.timestamp",
+              "jsonPath": "$[*].timestamp",
               "name": "Time"
             },
             {
-              "jsonPath": "$.remote_addr",
+              "jsonPath": "$[*].count",
+              "language": "jsonpath",
+              "name": "Count",
+              "type": "number"
+            },
+            {
+              "jsonPath": "$[*].remote_addr",
               "name": "IP"
             },
             {
-              "jsonPath": "$.method",
+              "jsonPath": "$[*].method",
               "name": "Method"
             },
             {
-              "jsonPath": "$.path",
+              "jsonPath": "$[*].path",
               "name": "Path"
             },
             {
-              "jsonPath": "$.user_agent",
+              "jsonPath": "$[*].user_agent",
               "name": "User Agent"
             }
           ],

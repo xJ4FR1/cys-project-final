@@ -30,14 +30,32 @@ class LogHandler(BaseHTTPRequestHandler):
         try:
             # Read NDJSON file and convert to JSON array
             logs = []
+            all_keys = set()
+            raw_logs = []
+            
+            # First pass: collect all unique keys
             with open(file_path, 'r') as f:
-                for line in f:
+                for i, line in enumerate(f, 1):
                     line = line.strip()
                     if line:
                         try:
-                            logs.append(json.loads(line))
+                            log_entry = json.loads(line)
+                            all_keys.update(log_entry.keys())
+                            raw_logs.append((i, log_entry))
                         except json.JSONDecodeError:
                             continue
+            
+            # Second pass: normalize all entries to have the same keys
+            for i, log_entry in raw_logs:
+                # Add missing keys with None values
+                for key in all_keys:
+                    if key not in log_entry:
+                        log_entry[key] = None
+                
+                # Add visualization fields
+                log_entry['count'] = 1
+                log_entry['id'] = i
+                logs.append(log_entry)
             
             # Send response
             self.send_response(200)
