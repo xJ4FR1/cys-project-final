@@ -4,16 +4,16 @@ datasources:
   - name: SSH Logs
     type: marcusolsson-json-datasource
     access: proxy
-    url: file:///var/log/honeypot/ssh-honeypot
+    url: file:///var/log/honeypot
     isDefault: true
     editable: true
     jsonData:
-      cacheDurationSeconds: 300
+      cacheDurationSeconds: 60
   
   - name: Web Logs
     type: marcusolsson-json-datasource
     access: proxy
-    url: file:///var/log/honeypot/web-honeypot
+    url: file:///var/log/honeypot
     editable: true
     jsonData:
-      cacheDurationSeconds: 300
+      cacheDurationSeconds: 60
