@@ -12,7 +12,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "SSH Logs"
+        "uid": "ssh-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -93,7 +93,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "SSH Logs"
+            "uid": "ssh-logs"
           },
           "fields": [
             {
@@ -118,7 +118,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "Web Logs"
+        "uid": "web-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -195,7 +195,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "Web Logs"
+            "uid": "web-logs"
           },
           "fields": [
             {
@@ -220,7 +220,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "SSH Logs"
+        "uid": "ssh-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -273,7 +273,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "SSH Logs"
+            "uid": "ssh-logs"
           },
           "fields": [
             {
@@ -293,7 +293,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "Web Logs"
+        "uid": "web-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -346,7 +346,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "Web Logs"
+            "uid": "web-logs"
           },
           "fields": [
             {
@@ -366,7 +366,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "SSH Logs"
+        "uid": "ssh-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -411,7 +411,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "SSH Logs"
+            "uid": "ssh-logs"
           },
           "fields": [
             {
@@ -431,7 +431,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "Web Logs"
+        "uid": "web-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -476,7 +476,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "Web Logs"
+            "uid": "web-logs"
           },
           "fields": [
             {
@@ -496,7 +496,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "SSH Logs"
+        "uid": "ssh-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -549,7 +549,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "SSH Logs"
+            "uid": "ssh-logs"
           },
           "fields": [
             {
@@ -593,7 +593,7 @@
     {
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "Web Logs"
+        "uid": "web-logs"
       },
       "fieldConfig": {
         "defaults": {
@@ -646,7 +646,7 @@
           "cacheDurationSeconds": 30,
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "Web Logs"
+            "uid": "web-logs"
           },
           "fields": [
             {
