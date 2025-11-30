@@ -1,11 +1,19 @@
 apiVersion: 1
 
 datasources:
-  - name: JSON Logs
+  - name: SSH Logs
     type: marcusolsson-json-datasource
     access: proxy
-    url: file:///var/log/honeypot
+    url: file:///var/log/honeypot/ssh-honeypot
     isDefault: true
     editable: true
     jsonData:
-      path: "*.json"
+      cacheDurationSeconds: 300
+  
+  - name: Web Logs
+    type: marcusolsson-json-datasource
+    access: proxy
+    url: file:///var/log/honeypot/web-honeypot
+    editable: true
+    jsonData:
+      cacheDurationSeconds: 300
