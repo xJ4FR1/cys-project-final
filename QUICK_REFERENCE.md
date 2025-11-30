@@ -191,6 +191,16 @@ sudo chown -R $USER:$USER logs/
 sudo chown -R $USER:$USER data/
 ```
 
+### Grafana permission errors
+```bash
+# If Grafana fails with permission errors, it's already fixed in docker-compose.yml
+# Just restart:
+sudo docker compose down
+sudo docker compose up -d
+
+# If still failing, see GRAFANA_FIX.md for detailed troubleshooting
+```
+
 ## 🔄 Updates & Maintenance
 
 ### Update Docker images

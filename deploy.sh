@@ -40,8 +40,10 @@ fi
 # Create necessary directories
 echo "📁 Creating directories..."
 mkdir -p logs/{ssh-honeypot,dionaea,web-honeypot}
-mkdir -p data/{dionaea,grafana}
+mkdir -p data/dionaea
 chmod -R 755 logs data
+
+# Note: Grafana now uses Docker volume instead of bind mount to avoid permission issues
 
 # Security warnings
 echo ""

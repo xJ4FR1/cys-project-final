@@ -63,18 +63,23 @@ services:
     image: grafana/grafana:10.2.2
     container_name: honeypot-grafana
     restart: unless-stopped
+    user: "0:0"  # Run as root to avoid permission issues
     ports:
       - "3000:3000"
     volumes:
       - ./logs:/var/log/honeypot:ro
       - ./dashboards:/var/lib/grafana/dashboards
-      - ./data/grafana:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=honeypot123
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
       - GF_INSTALL_PLUGINS=grafana-piechart-panel,marcusolsson-json-datasource
+      - GF_PATHS_DATA=/var/lib/grafana
+      - GF_PATHS_LOGS=/var/log/grafana
+      - GF_PATHS_PLUGINS=/var/lib/grafana/plugins
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     networks:
       - honeypot-net
     labels:
@@ -86,3 +91,6 @@ networks:
     ipam:
       config:
         - subnet: 172.25.0.0/16
+
+volumes:
+  grafana-data:
