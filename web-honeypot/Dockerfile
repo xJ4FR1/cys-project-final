@@ -12,7 +12,7 @@ COPY app.py /app/
 RUN mkdir -p /app/logs
 
 # Expose port
-EXPOSE 8888
+EXPOSE 80
 
 # Run with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8888", "--access-logfile", "/app/logs/access.log", "--error-logfile", "/app/logs/error.log", "--access-logformat", "%(h)s %(l)s %(u)s %(t)s \"%(r)s\" %(s)s %(b)s \"%(f)s\" \"%(a)s\"", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--access-logfile", "/app/logs/access.log", "--error-logfile", "/app/logs/error.log", "--access-logformat", "%(h)s %(l)s %(u)s %(t)s \"%(r)s\" %(s)s %(b)s \"%(f)s\" \"%(a)s\"", "app:app"]

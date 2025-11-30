@@ -34,7 +34,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 HOST_KEY = paramiko.RSAKey(filename='/app/ssh_host_rsa_key')
-SSH_PORT = 2222
+SSH_PORT = 222
 
 class SSHServerHandler(paramiko.ServerInterface):
     def __init__(self, client_ip):

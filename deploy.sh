@@ -39,8 +39,8 @@ fi
 
 # Create necessary directories
 echo "📁 Creating directories..."
-mkdir -p logs/{cowrie,heralding,web-honeypot}
-mkdir -p data/{cowrie/{etc,var},heralding,loki,prometheus,grafana}
+mkdir -p logs/{ssh-honeypot,dionaea,web-honeypot}
+mkdir -p data/{dionaea,grafana}
 chmod -R 755 logs data
 
 # Security warnings
@@ -63,7 +63,7 @@ fi
 
 # Check for port conflicts
 echo "🔍 Checking for port conflicts..."
-PORTS=(2222 2223 21 8080 25 23 110 5432 3306 8888 3000 9090 3100)
+PORTS=(222 211 80 3000)
 CONFLICTS=0
 
 for PORT in "${PORTS[@]}"; do
@@ -88,9 +88,9 @@ echo ""
 echo "📥 Pulling Docker images..."
 docker compose pull
 
-# Build custom web honeypot
-echo "🔨 Building web honeypot..."
-docker compose build web-honeypot
+# Build custom honeypots
+echo "🔨 Building honeypots..."
+docker compose build ssh-honeypot web-honeypot
 
 # Start services
 echo "🚀 Starting honeypot stack..."
@@ -117,23 +117,9 @@ else
     echo -e "${RED}❌ Grafana is not responding${NC}"
 fi
 
-# Test Prometheus
-if curl -s -o /dev/null -w "%{http_code}" http://localhost:9090 | grep -q "200"; then
-    echo -e "${GREEN}✓ Prometheus is running (http://localhost:9090)${NC}"
-else
-    echo -e "${RED}❌ Prometheus is not responding${NC}"
-fi
-
-# Test Loki
-if curl -s http://localhost:3100/ready | grep -q "ready"; then
-    echo -e "${GREEN}✓ Loki is running (http://localhost:3100)${NC}"
-else
-    echo -e "${RED}❌ Loki is not responding${NC}"
-fi
-
 # Test Web Honeypot
-if curl -s -o /dev/null -w "%{http_code}" http://localhost:8888 | grep -q "200"; then
-    echo -e "${GREEN}✓ Web Honeypot is running (http://localhost:8888)${NC}"
+if curl -s -o /dev/null -w "%{http_code}" http://localhost:80 | grep -q "200"; then
+    echo -e "${GREEN}✓ Web Honeypot is running (http://localhost:80)${NC}"
 else
     echo -e "${RED}❌ Web Honeypot is not responding${NC}"
 fi
@@ -149,26 +135,23 @@ echo -e "   Username: ${YELLOW}admin${NC}"
 echo -e "   Password: ${YELLOW}honeypot123${NC}"
 echo ""
 echo "🍯 Honeypot Ports:"
-echo "   SSH (Cowrie):        2222, 2223"
-echo "   FTP (Heralding):     21"
-echo "   HTTP (Heralding):    8080"
-echo "   Web Honeypot:        8888"
-echo "   SMTP:                25"
-echo "   Telnet:              23"
-echo "   POP3:                110"
-echo "   PostgreSQL:          5432"
-echo "   MySQL:               3306"
+echo "   SSH Honeypot:        222"
+echo "   FTP Honeypot:        211"
+echo "   Web Honeypot:        80"
 echo ""
-echo "📈 Monitoring:"
+echo "📈 Visualization:"
 echo "   Grafana:             http://localhost:3000"
-echo "   Prometheus:          http://localhost:9090"
-echo "   Loki:                http://localhost:3100"
 echo ""
 echo "📝 Useful commands:"
 echo "   View logs:           docker compose logs -f"
 echo "   Stop services:       docker compose down"
 echo "   Restart services:    docker compose restart"
 echo "   Check status:        docker compose ps"
+echo ""
+echo "📁 Log files:"
+echo "   SSH logs:            ./logs/ssh-honeypot/ssh_honeypot.json"
+echo "   FTP logs:            ./logs/dionaea/"
+echo "   Web logs:            ./logs/web-honeypot/honeypot.json"
 echo ""
 echo -e "${YELLOW}⚠️  Remember to change the default Grafana password!${NC}"
 echo ""

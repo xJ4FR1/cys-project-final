@@ -10,7 +10,7 @@ services:
     hostname: srv-prod-01
     restart: unless-stopped
     ports:
-      - "2222:2222"  # SSH honeypot
+      - "222:222"  # SSH honeypot
     volumes:
       - ./logs/ssh-honeypot:/app/logs
     networks:
@@ -19,29 +19,21 @@ services:
       - "honeypot.type=ssh"
       - "honeypot.name=ssh-honeypot"
 
-  # Dionaea Multi-Protocol Honeypot (FTP, HTTP, SMTP, etc)
+  # FTP Honeypot (Dionaea - FTP only)
   dionaea:
     image: dinotools/dionaea:latest
-    container_name: honeypot-dionaea
+    container_name: honeypot-ftp
     hostname: file-server-02
     restart: unless-stopped
     ports:
-      - "21:21"      # FTP
-      - "8081:80"    # HTTP
-      - "8443:443"   # HTTPS
-      - "23:23"      # Telnet
-      - "3306:3306"  # MySQL
-      - "5432:5432"  # PostgreSQL
-      - "1433:1433"  # MSSQL
-      - "135:135"    # EPMAP
-      - "445:445"    # SMB
+      - "211:21"      # FTP
     volumes:
       - ./logs/dionaea:/opt/dionaea/var/log
       - ./data/dionaea:/opt/dionaea/var/dionaea
     networks:
       - honeypot-net
     labels:
-      - "honeypot.type=multi"
+      - "honeypot.type=ftp"
       - "honeypot.name=dionaea"
 
   # Custom Web Honeypot
@@ -51,7 +43,7 @@ services:
     hostname: web-app-03
     restart: unless-stopped
     ports:
-      - "8888:8888"  # Web honeypot
+      - "80:80"  # Web honeypot
     volumes:
       - ./logs/web-honeypot:/app/logs
     environment:
@@ -63,98 +55,8 @@ services:
       - "honeypot.name=web-honeypot"
 
   # ==========================================
-  # LOGGING & MONITORING
+  # VISUALIZATION
   # ==========================================
-
-  # Loki - Log aggregation
-  loki:
-    image: grafana/loki:2.9.3
-    container_name: honeypot-loki
-    restart: unless-stopped
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./config/loki:/etc/loki
-      - ./data/loki:/loki
-    command: -config.file=/etc/loki/loki-config.yml
-    networks:
-      - honeypot-net
-    labels:
-      - "monitoring.component=logs"
-
-  # Promtail - Log shipper
-  promtail:
-    image: grafana/promtail:2.9.3
-    container_name: honeypot-promtail
-    restart: unless-stopped
-    volumes:
-      - ./config/promtail:/etc/promtail
-      - ./logs:/var/log/honeypot:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-    command: -config.file=/etc/promtail/promtail-config.yml
-    networks:
-      - honeypot-net
-    depends_on:
-      - loki
-    labels:
-      - "monitoring.component=log-shipper"
-
-  # Prometheus - Metrics collection
-  prometheus:
-    image: prom/prometheus:v2.48.0
-    container_name: honeypot-prometheus
-    restart: unless-stopped
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./config/prometheus:/etc/prometheus
-      - ./data/prometheus:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    networks:
-      - honeypot-net
-    labels:
-      - "monitoring.component=metrics"
-
-  # Node Exporter - System metrics
-  node-exporter:
-    image: prom/node-exporter:v1.7.0
-    container_name: honeypot-node-exporter
-    restart: unless-stopped
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    networks:
-      - honeypot-net
-    labels:
-      - "monitoring.component=exporter"
-
-  # cAdvisor - Container metrics
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.2
-    container_name: honeypot-cadvisor
-    restart: unless-stopped
-    privileged: true
-    devices:
-      - /dev/kmsg
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    networks:
-      - honeypot-net
-    labels:
-      - "monitoring.component=container-metrics"
 
   # Grafana - Visualization
   grafana:
@@ -164,8 +66,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./logs:/var/log/honeypot:ro
       - ./dashboards:/var/lib/grafana/dashboards
       - ./data/grafana:/var/lib/grafana
     environment:
@@ -173,12 +74,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=honeypot123
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
-      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,marcusolsson-json-datasource
     networks:
       - honeypot-net
-    depends_on:
-      - prometheus
-      - loki
     labels:
       - "monitoring.component=visualization"
 
@@ -188,10 +86,3 @@ networks:
     ipam:
       config:
         - subnet: 172.25.0.0/16
-
-volumes:
-  cowrie-data:
-  heralding-data:
-  loki-data:
-  prometheus-data:
-  grafana-data:

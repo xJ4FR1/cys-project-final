@@ -13,7 +13,7 @@ COPY ssh_host_rsa_key /app/
 RUN mkdir -p /app/logs
 
 # Expose SSH port
-EXPOSE 2222
+EXPOSE 222
 
 # Run the honeypot
 CMD ["python", "-u", "ssh_honeypot.py"]
