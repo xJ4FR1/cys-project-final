@@ -68,7 +68,9 @@ services:
       - "3000:3000"
     volumes:
       - ./logs:/var/log/honeypot:ro
-      - ./dashboards:/var/lib/grafana/dashboards
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - grafana-data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
