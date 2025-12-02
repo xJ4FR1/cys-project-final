@@ -14,9 +14,24 @@ def parse_dionaea_log(log_file):
     if not Path(log_file).exists():
         return events
     
+    # Define standard fields for all events
+    def create_event(timestamp, event_type, **kwargs):
+        """Create a normalized event with all possible fields"""
+        event = {
+            'timestamp': timestamp,
+            'event_type': event_type,
+            'protocol': 'ftp',
+            'src_ip': kwargs.get('src_ip', None),
+            'src_port': kwargs.get('src_port', None),
+            'dst_port': kwargs.get('dst_port', None),
+            'command': kwargs.get('command', None),
+            'message': kwargs.get('message', None),
+            'count': kwargs.get('count', 1)
+        }
+        return event
+    
     # Regex patterns for different log types
     connection_pattern = r'\[(\d{2}\w{3}\d{4} \d{2}:\d{2}:\d{2})\] connection\s+(\S+)\s+(\S+)\s+(\d+)\s+<->\s+(\S+)\s+(\d+)'
-    ftp_pattern = r'ftp'
     
     try:
         with open(log_file, 'r', errors='ignore') as f:
@@ -32,15 +47,13 @@ def parse_dionaea_log(log_file):
                     except:
                         timestamp = datetime.now().isoformat()
                     
-                    event = {
-                        'timestamp': timestamp,
-                        'event_type': 'connection',
-                        'protocol': 'ftp',
-                        'src_ip': conn_match.group(4),
-                        'src_port': int(conn_match.group(5)),
-                        'dst_port': int(conn_match.group(6)),
-                        'count': 1
-                    }
+                    event = create_event(
+                        timestamp=timestamp,
+                        event_type='connection',
+                        src_ip=conn_match.group(4),
+                        src_port=int(conn_match.group(5)),
+                        dst_port=int(conn_match.group(6))
+                    )
                     events.append(event)
                 
                 # Parse FTP commands
@@ -62,13 +75,11 @@ def parse_dionaea_log(log_file):
                                 break
                         
                         if command:
-                            event = {
-                                'timestamp': timestamp,
-                                'event_type': 'ftp_command',
-                                'protocol': 'ftp',
-                                'command': command,
-                                'count': 1
-                            }
+                            event = create_event(
+                                timestamp=timestamp,
+                                event_type='ftp_command',
+                                command=command
+                            )
                             events.append(event)
     
     except Exception as e:
@@ -76,13 +87,12 @@ def parse_dionaea_log(log_file):
     
     # If no events found, create a dummy event to prevent dashboard errors
     if not events:
-        events.append({
-            'timestamp': datetime.now().isoformat(),
-            'event_type': 'no_activity',
-            'protocol': 'ftp',
-            'message': 'No FTP activity detected yet',
-            'count': 0
-        })
+        events.append(create_event(
+            timestamp=datetime.now().isoformat(),
+            event_type='no_activity',
+            message='No FTP activity detected yet',
+            count=0
+        ))
     
     return events
 
