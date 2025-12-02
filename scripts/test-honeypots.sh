@@ -78,6 +78,12 @@ if confirm "Generate test traffic to honeypots?"; then
     echo "  Testing SSH (will fail authentication - expected)..."
     sshpass -p 'testpass' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 222 testuser@localhost exit 2>/dev/null &
     
+    # Test FTP
+    echo "  Testing FTP login attempts..."
+    for i in {1..3}; do
+        (echo "USER admin$i"; echo "PASS admin123"; echo "QUIT") | nc -w 2 localhost 211 > /dev/null 2>&1 &
+    done
+    
     # Test Web
     echo "  Testing Web endpoints..."
     curl -s http://localhost/ > /dev/null
@@ -87,7 +93,7 @@ if confirm "Generate test traffic to honeypots?"; then
     curl -s -X POST http://localhost/login -d "username=admin&password=admin123" > /dev/null
     
     echo "  Test traffic generated!"
-    echo "  Wait 30 seconds, then check Grafana dashboards."
+    echo "  Wait 30-40 seconds for FTP logs to parse, then check Grafana dashboards."
 fi
 
 echo ""

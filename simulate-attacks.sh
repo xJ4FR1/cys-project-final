@@ -104,11 +104,11 @@ simulate_ftp_attacks() {
     echo -e "${YELLOW}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     
-    declare -a FTP_USERS=("anonymous" "ftp" "admin")
-    declare -a FTP_PASS=("anonymous" "ftp" "admin")
+    declare -a FTP_USERS=("anonymous" "ftp" "admin" "root" "user")
+    declare -a FTP_PASS=("anonymous" "ftp" "admin123" "password" "123456")
     
     local attack_count=0
-    local max_attacks=6
+    local max_attacks=10
     
     echo "Launching FTP connection attempts..."
     echo ""
@@ -123,14 +123,15 @@ simulate_ftp_attacks() {
                 break
             fi
             
+            # Skip same username/password combinations
+            if [ "$user" == "$pass" ] && [ "$user" != "anonymous" ] && [ "$user" != "ftp" ]; then
+                continue
+            fi
+            
             echo -e "  ${BLUE}→${NC} FTP attempt: $user:$pass"
             
-            # Try FTP connection
-            timeout 3 ftp -n $TARGET $FTP_PORT <<EOF 2>/dev/null || true
-user $user $pass
-ls
-quit
-EOF
+            # Send FTP commands using netcat (more reliable with Dionaea)
+            (echo "USER $user"; echo "PASS $pass"; echo "QUIT") | nc -w 2 $TARGET $FTP_PORT > /dev/null 2>&1 || true
             
             attack_count=$((attack_count + 1))
             sleep $DELAY
@@ -232,13 +233,7 @@ else
 fi
 
 if [ $FTP_AVAILABLE -eq 1 ]; then
-    if command -v ftp &> /dev/null; then
-        simulate_ftp_attacks
-    else
-        echo -e "${YELLOW}⚠️  ftp client not installed. Skipping FTP attacks.${NC}"
-        echo "   Install with: sudo apt install ftp"
-        echo ""
-    fi
+    simulate_ftp_attacks
 else
     echo -e "${YELLOW}⚠️  FTP honeypot not available. Skipping FTP attacks.${NC}"
     echo ""
@@ -263,11 +258,11 @@ echo "   Duration: ${DURATION}s"
 echo "   Target: $TARGET"
 echo ""
 echo "📈 Next steps:"
-echo "   1. Wait 10-15 seconds for logs to flush"
+echo "   1. Wait 30-40 seconds for logs to flush (FTP parser runs every 30s)"
 echo "   2. Check Grafana dashboards: http://localhost:3000"
 echo "   3. Analyze logs: ./scripts/analyze-logs.sh"
 echo "   4. View log files:"
 echo "      - SSH: logs/ssh-honeypot/ssh_honeypot.json"
 echo "      - Web: logs/web-honeypot/honeypot.json"
-echo "      - FTP: logs/dionaea/"
+echo "      - FTP: logs/dionaea/ (parsed to ftp_parsed.json)"
 echo ""

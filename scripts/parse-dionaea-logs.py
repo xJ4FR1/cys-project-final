@@ -58,29 +58,46 @@ def parse_dionaea_log(log_file):
                     )
                     events.append(event)
                 
-                # Parse FTP commands
-                elif 'ftp' in line.lower() and ('USER' in line or 'PASS' in line or 'RETR' in line or 'STOR' in line):
+                # Parse FTP commands - format: processing line 'b'USER testuser5''
+                elif 'processing line' in line and ("b'USER" in line or "b'PASS" in line or "b'RETR" in line or "b'STOR" in line):
                     # Extract timestamp
-                    ts_match = re.search(r'\[(\d{2}\w{3}\d{4} \d{2}:\d{2}:\d{2})\]', line)
+                    ts_match = re.search(r'\[(\d{2}\d{2}\d{4} \d{2}:\d{2}:\d{2})\]', line)
                     if ts_match:
                         try:
-                            dt = datetime.strptime(ts_match.group(1), '%d%b%Y %H:%M:%S')
+                            dt = datetime.strptime(ts_match.group(1), '%m%d%Y %H:%M:%S')
                             timestamp = dt.isoformat()
                         except:
                             timestamp = datetime.now().isoformat()
                         
-                        # Extract command
+                        # Extract command and parameters - format: processing line 'b'USER testuser5''
+                        username = None
+                        password = None
                         command = None
-                        for cmd in ['USER', 'PASS', 'RETR', 'STOR', 'LIST', 'CWD']:
-                            if cmd in line:
-                                command = cmd
-                                break
+                        
+                        if "b'USER" in line:
+                            command = 'USER'
+                            # Extract username: processing line 'b'USER testuser5''
+                            user_match = re.search(r"b'USER\s+([^']+)'", line)
+                            if user_match:
+                                username = user_match.group(1).strip()
+                        elif "b'PASS" in line:
+                            command = 'PASS'
+                            # Extract password
+                            pass_match = re.search(r"b'PASS\s+([^']+)'", line)
+                            if pass_match:
+                                password = pass_match.group(1).strip()
+                        elif "b'RETR" in line:
+                            command = 'RETR'
+                        elif "b'STOR" in line:
+                            command = 'STOR'
                         
                         if command:
                             event = create_event(
                                 timestamp=timestamp,
                                 event_type='ftp_command',
-                                command=command
+                                command=command,
+                                username=username,
+                                password=password
                             )
                             events.append(event)
     
