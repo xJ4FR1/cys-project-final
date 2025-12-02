@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
 Simple HTTP server that converts NDJSON log files to JSON arrays
+Also parses Dionaea text logs on-demand
 """
 import os
 import json
+import subprocess
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
@@ -15,13 +17,23 @@ class LogHandler(BaseHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         path = parsed_path.path.lstrip('/')
         
-        # Build full file path
-        file_path = os.path.join(self.LOG_DIR, path)
-        
-        # Check if file exists and is a JSON file
-        if not os.path.exists(file_path):
-            self.send_error(404, "File not found")
-            return
+        # Special handling for Dionaea FTP logs
+        if path == 'dionaea/ftp_parsed.json':
+            # Parse Dionaea logs on-demand and serve from app directory
+            try:
+                subprocess.run(['python3', '/app/parse_dionaea.py'], check=True, capture_output=True)
+                file_path = '/app/ftp_parsed.json'
+            except:
+                self.send_error(500, "Failed to parse Dionaea logs")
+                return
+        else:
+            # Build full file path
+            file_path = os.path.join(self.LOG_DIR, path)
+            
+            # Check if file exists and is a JSON file
+            if not os.path.exists(file_path):
+                self.send_error(404, "File not found")
+                return
         
         if not file_path.endswith('.json'):
             self.send_error(400, "Only JSON files are supported")

@@ -6,6 +6,13 @@ logs/
 # Data directories
 data/
 
+# Generated PDFs
+*.pdf
+
+# Exported logs
+exports/
+exported_logs/
+
 # Python
 __pycache__/
 *.py[cod]

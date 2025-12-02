@@ -14,30 +14,31 @@ echo ""
 echo "📋 Copying log files..."
 cp -r logs/* "$EXPORT_DIR/" 2>/dev/null
 
-# Export from Loki (if available)
-if command -v curl &> /dev/null; then
-    echo "📥 Exporting from Loki..."
+# Generate statistics for export
+if command -v jq &> /dev/null; then
+    echo "📊 Generating statistics..."
     
-    # Export Cowrie logs
-    curl -G -s "http://localhost:3100/loki/api/v1/query_range" \
-        --data-urlencode 'query={job="cowrie"}' \
-        --data-urlencode 'start='$(date -d '7 days ago' +%s)'000000000' \
-        --data-urlencode 'end='$(date +%s)'000000000' \
-        > "$EXPORT_DIR/cowrie_loki_export.json" 2>/dev/null
+    # SSH statistics
+    if [ -f "logs/ssh-honeypot/ssh_honeypot.json" ]; then
+        echo "  SSH honeypot statistics..."
+        cat logs/ssh-honeypot/ssh_honeypot.json | jq -s '{
+            total_events: length,
+            unique_ips: [.[].src_ip] | unique | length,
+            unique_usernames: [.[].username] | unique | length,
+            top_ips: ([.[].src_ip] | group_by(.) | map({ip: .[0], count: length}) | sort_by(.count) | reverse | .[0:5])
+        }' > "$EXPORT_DIR/ssh_statistics.json" 2>/dev/null || true
+    fi
     
-    # Export Dionaea logs
-    curl -G -s "http://localhost:3100/loki/api/v1/query_range" \
-        --data-urlencode 'query={job="dionaea"}' \
-        --data-urlencode 'start='$(date -d '7 days ago' +%s)'000000000' \
-        --data-urlencode 'end='$(date +%s)'000000000' \
-        > "$EXPORT_DIR/dionaea_loki_export.json" 2>/dev/null
-    
-    # Export Web logs
-    curl -G -s "http://localhost:3100/loki/api/v1/query_range" \
-        --data-urlencode 'query={job="web-honeypot"}' \
-        --data-urlencode 'start='$(date -d '7 days ago' +%s)'000000000' \
-        --data-urlencode 'end='$(date +%s)'000000000' \
-        > "$EXPORT_DIR/web_loki_export.json" 2>/dev/null
+    # Web statistics
+    if [ -f "logs/web-honeypot/honeypot.json" ]; then
+        echo "  Web honeypot statistics..."
+        cat logs/web-honeypot/honeypot.json | jq -s '{
+            total_requests: length,
+            unique_ips: [.[].remote_addr] | unique | length,
+            unique_paths: [.[].path] | unique | length,
+            top_paths: ([.[].path] | group_by(.) | map({path: .[0], count: length}) | sort_by(.count) | reverse | .[0:5])
+        }' > "$EXPORT_DIR/web_statistics.json" 2>/dev/null || true
+    fi
 fi
 
 # Create summary report

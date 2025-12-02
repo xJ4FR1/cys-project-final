@@ -11,33 +11,33 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Test SSH honeypot
-echo "Testing SSH Honeypot (port 2222)..."
-if nc -zv localhost 2222 2>&1 | grep -q "succeeded\|open"; then
+echo "Testing SSH Honeypot (port 222)..."
+if nc -zv localhost 222 2>&1 | grep -q "succeeded\|open"; then
     echo -e "${GREEN}✓ SSH honeypot is accessible${NC}"
-    echo "  Try: ssh -p 2222 root@localhost"
+    echo "  Try: ssh -p 222 root@localhost"
 else
     echo -e "${RED}✗ SSH honeypot is not accessible${NC}"
 fi
 echo ""
 
 # Test FTP honeypot
-echo "Testing FTP Honeypot (port 21)..."
-if nc -zv localhost 21 2>&1 | grep -q "succeeded\|open"; then
+echo "Testing FTP Honeypot (port 211)..."
+if nc -zv localhost 211 2>&1 | grep -q "succeeded\|open"; then
     echo -e "${GREEN}✓ FTP honeypot is accessible${NC}"
-    echo "  Try: ftp localhost 21"
+    echo "  Try: ftp localhost 211"
 else
     echo -e "${RED}✗ FTP honeypot is not accessible${NC}"
 fi
 echo ""
 
 # Test Web honeypot
-echo "Testing Web Honeypot (port 8888)..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888 2>/dev/null)
+echo "Testing Web Honeypot (port 80)..."
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost 2>/dev/null)
 if [ "$HTTP_CODE" = "200" ]; then
     echo -e "${GREEN}✓ Web honeypot is responding (HTTP $HTTP_CODE)${NC}"
-    echo "  Try: curl http://localhost:8888"
-    echo "       curl http://localhost:8888/admin"
-    echo "       curl http://localhost:8888/.env"
+    echo "  Try: curl http://localhost"
+    echo "       curl http://localhost/admin"
+    echo "       curl http://localhost/.env"
 else
     echo -e "${RED}✗ Web honeypot returned HTTP $HTTP_CODE${NC}"
 fi
@@ -56,25 +56,14 @@ else
 fi
 echo ""
 
-# Test Prometheus
-echo "Testing Prometheus..."
-PROM_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/-/healthy 2>/dev/null)
-if [ "$PROM_CODE" = "200" ]; then
-    echo -e "${GREEN}✓ Prometheus is healthy${NC}"
-    echo "  URL: http://localhost:9090"
+# Test Log Server
+echo "Testing Log Server..."
+LOG_SERVER_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ 2>/dev/null)
+if [[ "$LOG_SERVER_CODE" =~ ^(200|404)$ ]]; then
+    echo -e "${GREEN}✓ Log server is responding (HTTP $LOG_SERVER_CODE)${NC}"
+    echo "  URL: http://localhost:8080"
 else
-    echo -e "${RED}✗ Prometheus health check failed${NC}"
-fi
-echo ""
-
-# Test Loki
-echo "Testing Loki..."
-LOKI_STATUS=$(curl -s http://localhost:3100/ready 2>/dev/null)
-if echo "$LOKI_STATUS" | grep -q "ready"; then
-    echo -e "${GREEN}✓ Loki is ready${NC}"
-    echo "  URL: http://localhost:3100"
-else
-    echo -e "${RED}✗ Loki is not ready${NC}"
+    echo -e "${RED}✗ Log server returned HTTP $LOG_SERVER_CODE${NC}"
 fi
 echo ""
 
@@ -87,15 +76,15 @@ if confirm "Generate test traffic to honeypots?"; then
     
     # Test SSH
     echo "  Testing SSH (will fail authentication - expected)..."
-    sshpass -p 'testpass' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2222 testuser@localhost exit 2>/dev/null &
+    sshpass -p 'testpass' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 222 testuser@localhost exit 2>/dev/null &
     
     # Test Web
     echo "  Testing Web endpoints..."
-    curl -s http://localhost:8888/ > /dev/null
-    curl -s http://localhost:8888/admin > /dev/null
-    curl -s http://localhost:8888/.env > /dev/null
-    curl -s http://localhost:8888/wp-admin/ > /dev/null
-    curl -s -X POST http://localhost:8888/login -d "username=admin&password=admin123" > /dev/null
+    curl -s http://localhost/ > /dev/null
+    curl -s http://localhost/admin > /dev/null
+    curl -s http://localhost/.env > /dev/null
+    curl -s http://localhost/wp-admin/ > /dev/null
+    curl -s -X POST http://localhost/login -d "username=admin&password=admin123" > /dev/null
     
     echo "  Test traffic generated!"
     echo "  Wait 30 seconds, then check Grafana dashboards."

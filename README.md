@@ -121,6 +121,12 @@ Username: admin
 Password: honeypot123
 ```
 
+**Available Dashboards:**
+- **Honeypot Overview** - Combined view of all attack vectors
+- **SSH Honeypot Dashboard** - Detailed SSH attack analysis
+- **Web Honeypot Dashboard** - HTTP/HTTPS attack patterns
+- **FTP Honeypot Dashboard** - FTP attack monitoring
+
 ---
 
 ## 📁 Directory Structure
@@ -129,10 +135,22 @@ Password: honeypot123
 cys-project-final/
 ├── docker-compose.yml          # 4 services (simplified)
 ├── deploy.sh                   # Deployment script
-├── EVALUATION.md              # Project evaluation
-├── SIMPLIFIED_SETUP.md        # Setup guide
-├── QUICK_REFERENCE.md         # Command reference
-├── ARCHITECTURE.md            # Architecture diagrams
+├── README.md                   # This file
+│
+├── docs/                       # 📚 Documentation (MD + PDF)
+│   ├── ARCHITECTURE.md/pdf
+│   ├── ATTACK_SIMULATION.md/pdf
+│   ├── PRESENTATION_GUIDE.md/pdf
+│   ├── PROJECT_NOTES.md/pdf
+│   ├── PROJECT_SUMMARY.md/pdf
+│   ├── QUICK_REFERENCE.md/pdf
+│   └── QUICK_START_CARD.md/pdf
+│
+├── dashboards/                 # Grafana dashboards
+│   ├── combined-overview.json
+│   ├── ssh-attacks.json
+│   ├── web-attacks.json
+│   └── ftp-attacks.json
 │
 ├── ssh-honeypot/              # SSH honeypot
 │   ├── Dockerfile
@@ -143,17 +161,26 @@ cys-project-final/
 │   ├── Dockerfile
 │   └── app.py                 # Port 80
 │
+├── log-server/                # JSON normalization
+│   ├── Dockerfile
+│   └── convert_logs.py
+│
 ├── config/
 │   └── grafana/
-│       └── datasources/
-│           └── datasources.yml # JSON datasource
+│       ├── datasources/
+│       └── dashboards/
 │
-├── logs/                       # All honeypot logs
+├── scripts/                   # Utility scripts
+│   ├── generate-all-pdfs.sh  # Generate all PDFs
+│   ├── verify-setup.sh       # Pre-demo verification
+│   └── test-honeypots.sh     # Attack simulations
+│
+├── logs/                      # All honeypot logs
 │   ├── ssh-honeypot/
 │   ├── dionaea/
 │   └── web-honeypot/
 │
-└── data/                       # Persistent data
+└── data/                      # Persistent data
     ├── dionaea/
     └── grafana/
 ```

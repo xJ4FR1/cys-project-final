@@ -19,3 +19,12 @@ datasources:
     editable: true
     jsonData:
       cacheDurationSeconds: 30
+  
+  - name: FTP Logs
+    type: marcusolsson-json-datasource
+    uid: ftp-logs
+    access: proxy
+    url: http://log-server:8080
+    editable: true
+    jsonData:
+      cacheDurationSeconds: 30

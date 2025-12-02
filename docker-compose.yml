@@ -32,6 +32,10 @@ services:
       - ./data/dionaea:/opt/dionaea/var/dionaea
     networks:
       - honeypot-net
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     labels:
       - "honeypot.type=ftp"
       - "honeypot.name=dionaea"
@@ -96,6 +100,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
       - GF_INSTALL_PLUGINS=grafana-piechart-panel,marcusolsson-json-datasource
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=marcusolsson-json-datasource
       - GF_PATHS_DATA=/var/lib/grafana
       - GF_PATHS_LOGS=/var/log/grafana
       - GF_PATHS_PLUGINS=/var/lib/grafana/plugins

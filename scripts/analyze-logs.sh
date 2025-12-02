@@ -28,40 +28,37 @@ echo "📊 STATISTICS"
 echo "-------------"
 echo ""
 
-# Cowrie (SSH) statistics
-if [ -d "logs/cowrie" ]; then
-    echo "🔐 SSH Honeypot (Cowrie):"
-    COWRIE_LOGS=$(find logs/cowrie -name "*.json" -type f 2>/dev/null)
+# SSH Honeypot statistics
+if [ -f "logs/ssh-honeypot/ssh_honeypot.json" ]; then
+    echo "🔐 SSH Honeypot:"
+    TOTAL_EVENTS=$(wc -l < logs/ssh-honeypot/ssh_honeypot.json 2>/dev/null || echo "0")
+    echo "   Total events: $TOTAL_EVENTS"
     
-    if [ -n "$COWRIE_LOGS" ]; then
-        TOTAL_EVENTS=$(cat $COWRIE_LOGS 2>/dev/null | wc -l)
-        echo "   Total events: $TOTAL_EVENTS"
+    if [ "$HAS_JQ" = "yes" ] && [ $TOTAL_EVENTS -gt 0 ]; then
+        echo "   Top attacking IPs:"
+        cat logs/ssh-honeypot/ssh_honeypot.json | jq -r '.src_ip // empty' | sort | uniq -c | sort -rn | head -5 | while read count ip; do
+            echo "      $ip: $count attempts"
+        done
         
-        if [ "$HAS_JQ" = "yes" ] && [ $TOTAL_EVENTS -gt 0 ]; then
-            echo "   Top attacking IPs:"
-            cat $COWRIE_LOGS 2>/dev/null | jq -r '.src_ip // empty' | sort | uniq -c | sort -rn | head -5 | while read count ip; do
-                echo "      $ip: $count attempts"
-            done
-            
-            echo "   Most used usernames:"
-            cat $COWRIE_LOGS 2>/dev/null | jq -r '.username // empty' | grep -v '^$' | sort | uniq -c | sort -rn | head -5 | while read count user; do
-                echo "      $user: $count attempts"
-            done
-            
-            echo "   Most used passwords:"
-            cat $COWRIE_LOGS 2>/dev/null | jq -r '.password // empty' | grep -v '^$' | sort | uniq -c | sort -rn | head -5 | while read count pass; do
-                echo "      $pass: $count attempts"
-            done
-        fi
-    else
-        echo "   No logs found yet"
+        echo "   Most used usernames:"
+        cat logs/ssh-honeypot/ssh_honeypot.json | jq -r 'select(.username) | .username' | sort | uniq -c | sort -rn | head -5 | while read count user; do
+            echo "      $user: $count attempts"
+        done
+        
+        echo "   Most used passwords:"
+        cat logs/ssh-honeypot/ssh_honeypot.json | jq -r 'select(.password) | .password' | sort | uniq -c | sort -rn | head -5 | while read count pass; do
+            echo "      $pass: $count attempts"
+        done
     fi
-    echo ""
+else
+    echo "🔐 SSH Honeypot:"
+    echo "   No logs found yet"
 fi
+echo ""
 
-# Dionaea (Multi-protocol) statistics
+# Dionaea (FTP Honeypot) statistics
 if [ -d "logs/dionaea" ]; then
-    echo "🌐 Multi-Protocol Honeypot (Dionaea):"
+    echo "📁 FTP Honeypot (Dionaea):"
     DIONAEA_LOGS=$(find logs/dionaea -name "*.log" -type f 2>/dev/null)
     
     if [ -n "$DIONAEA_LOGS" ]; then
@@ -83,40 +80,40 @@ if [ -d "logs/dionaea" ]; then
     else
         echo "   No logs found yet"
     fi
-    echo ""
+else
+    echo "📁 FTP Honeypot (Dionaea):"
+    echo "   No logs found yet"
 fi
+echo ""
 
 # Web Honeypot statistics
-if [ -d "logs/web-honeypot" ]; then
+if [ -f "logs/web-honeypot/honeypot.json" ]; then
     echo "🕸️  Web Honeypot:"
-    WEB_LOGS=$(find logs/web-honeypot -name "*.json" -type f 2>/dev/null)
+    TOTAL_REQUESTS=$(wc -l < logs/web-honeypot/honeypot.json 2>/dev/null || echo "0")
+    echo "   Total requests: $TOTAL_REQUESTS"
     
-    if [ -n "$WEB_LOGS" ]; then
-        TOTAL_REQUESTS=$(cat $WEB_LOGS 2>/dev/null | wc -l)
-        echo "   Total requests: $TOTAL_REQUESTS"
+    if [ "$HAS_JQ" = "yes" ] && [ $TOTAL_REQUESTS -gt 0 ]; then
+        echo "   Top paths requested:"
+        cat logs/web-honeypot/honeypot.json | jq -r '.path // empty' | sort | uniq -c | sort -rn | head -5 | while read count path; do
+            echo "      $path: $count requests"
+        done
         
-        if [ "$HAS_JQ" = "yes" ] && [ $TOTAL_REQUESTS -gt 0 ]; then
-            echo "   Top paths requested:"
-            cat $WEB_LOGS 2>/dev/null | jq -r '.path // empty' | sort | uniq -c | sort -rn | head -5 | while read count path; do
-                echo "      $path: $count requests"
-            done
-            
-            echo "   Top attacking IPs:"
-            cat $WEB_LOGS 2>/dev/null | jq -r '.remote_addr // empty' | sort | uniq -c | sort -rn | head -5 | while read count ip; do
-                echo "      $ip: $count requests"
-            done
-            
-            echo "   Top User Agents:"
-            cat $WEB_LOGS 2>/dev/null | jq -r '.user_agent // empty' | sort | uniq -c | sort -rn | head -3 | while read count agent; do
-                agent_short=$(echo "$agent" | cut -c1-60)
-                echo "      $agent_short: $count requests"
-            done
-        fi
-    else
-        echo "   No logs found yet"
+        echo "   Top attacking IPs:"
+        cat logs/web-honeypot/honeypot.json | jq -r '.remote_addr // empty' | sort | uniq -c | sort -rn | head -5 | while read count ip; do
+            echo "      $ip: $count requests"
+        done
+        
+        echo "   Top User Agents:"
+        cat logs/web-honeypot/honeypot.json | jq -r '.user_agent // empty' | sort | uniq -c | sort -rn | head -3 | while read count agent; do
+            agent_short=$(echo "$agent" | cut -c1-60)
+            echo "      $agent_short: $count requests"
+        done
     fi
-    echo ""
+else
+    echo "🕸️  Web Honeypot:"
+    echo "   No logs found yet"
 fi
+echo ""
 
 # Overall statistics
 echo "📈 OVERALL STATISTICS"
@@ -156,11 +153,11 @@ echo "Export all logs to archives:"
 echo "   ./scripts/export-logs.sh"
 echo ""
 echo "View live logs:"
-echo "   docker compose logs -f cowrie"
-echo "   docker compose logs -f heralding"
+echo "   docker compose logs -f ssh-honeypot"
+echo "   docker compose logs -f dionaea"
 echo "   docker compose logs -f web-honeypot"
 echo ""
-echo "Query Loki directly:"
-echo "   curl -G -s \"http://localhost:3100/loki/api/v1/query_range\" \\"
-echo "     --data-urlencode 'query={job=\"cowrie\"}' | jq ."
+echo "View Grafana Dashboards:"
+echo "   http://localhost:3000"
+echo "   Username: admin | Password: honeypot123"
 echo ""
