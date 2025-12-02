@@ -24,6 +24,8 @@ def parse_dionaea_log(log_file):
             'src_ip': kwargs.get('src_ip', None),
             'src_port': kwargs.get('src_port', None),
             'dst_port': kwargs.get('dst_port', None),
+            'username': kwargs.get('username', None),
+            'password': kwargs.get('password', None),
             'command': kwargs.get('command', None),
             'message': kwargs.get('message', None),
             'count': kwargs.get('count', 1)
