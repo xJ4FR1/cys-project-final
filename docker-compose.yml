@@ -40,6 +40,24 @@ services:
       - "honeypot.type=ftp"
       - "honeypot.name=dionaea"
 
+  # Dionaea Log Parser
+  dionaea-parser:
+    image: python:3.11-alpine
+    container_name: dionaea-parser
+    restart: unless-stopped
+    volumes:
+      - ./logs/dionaea:/opt/dionaea/var/log:ro
+      - ./logs/dionaea:/logs/dionaea
+      - ./scripts:/scripts:ro
+    command: sh /scripts/parse-dionaea-loop.sh
+    networks:
+      - honeypot-net
+    depends_on:
+      - dionaea
+    labels:
+      - "monitoring.component=log-parser"
+      - "honeypot.name=dionaea"
+
   # Custom Web Honeypot
   web-honeypot:
     build: ./web-honeypot
