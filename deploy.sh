@@ -41,9 +41,20 @@ fi
 echo "📁 Creating directories..."
 mkdir -p logs/{ssh-honeypot,dionaea,web-honeypot}
 mkdir -p data/dionaea
-chmod -R 755 logs data
+mkdir -p dashboards
+chmod -R 755 logs data dashboards
 
 # Note: Grafana now uses Docker volume instead of bind mount to avoid permission issues
+
+# Generate dashboards if they don't exist
+echo "📊 Setting up Grafana dashboards..."
+if [ ! -f "dashboards/honeypot-attacks.json" ] || [ ! -f "dashboards/ssh-attacks.json" ]; then
+    if [ -f "create-minimal-dashboards.py" ]; then
+        echo "   Creating dashboards from template..."
+        python3 create-minimal-dashboards.py || echo "   Warning: Dashboard creation failed, using existing files"
+    fi
+fi
+echo -e "${GREEN}✓ Dashboards ready${NC}"
 
 # Security warnings
 echo ""
